@@ -31,6 +31,14 @@ int main(int argc, char **argv){
 
     }
 
+    FILE *currentFile = fopen(argv[1], "r");
+    int c;
+    while((c = fgetc(currentFile)) != EOF){
+        printf("%c", c);
+    }
+    
+    fclose(currentFile);
+
     
     return 0;
 }
