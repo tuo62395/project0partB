@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 int main(int argc, char **argv){
     //less than 2 arguments = error
@@ -36,30 +38,38 @@ int main(int argc, char **argv){
 
     //end of error checking
 
-    //first, handling 2 arguments: sourceFile, destFile
-    if(noDir){
+    //first, handling 2 arguments: sourceFile, destFile (no directories)
+    if(noDir && argc == 3){
         //open source file
-        FILE *sourceFile = fopen(argv[1], "r");
-        if (sourceFile == NULL){
-            printf("Error: %s\n", strerror(errno));
+        int sourceFile;
+        if ((sourceFile = open(argv[1], O_RDONLY)) == -1){
+            puts("Error: failed to open file");
             exit(EXIT_FAILURE);
         }
 
         //open destination file
-        FILE *destFile = fopen(argv[2], "w");
-        if (destFile == NULL){
-            printf("Error: %s\n", strerror(errno));
+        int destFile;
+        if ((destFile = open(argv[2], O_CREAT | O_WRONLY, 0777)) == -1){
+            puts("Error: failed to open file");
             exit(EXIT_FAILURE);
         }
-
-        //iterate through source file
-        int c;
-        while((c = fgetc(sourceFile)) != EOF){
-            fprintf(destFile, "%c", c);
-        }
         
-        fclose(sourceFile);
-        fclose(destFile);
+        //iterate through source file
+
+        int bufferSize = 100;
+        int *buffer[bufferSize];
+        int bytesRead;
+
+        while ((bytesRead = read(sourceFile, buffer, bufferSize)) != 0){
+            write(destFile, buffer, bytesRead);
+
+        }
+
+        close(sourceFile);
+        close(destFile);
+        
+        
+       
     }
 
     
