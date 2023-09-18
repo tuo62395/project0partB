@@ -6,6 +6,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <libgen.h>
 
 int main(int argc, char **argv){
     //less than 2 arguments = error
@@ -69,7 +71,50 @@ int main(int argc, char **argv){
         close(destFile);
         
         
-       
+    }
+
+    //cases with directories at the end
+    if(noDir == 0){
+        //iterate through arguments
+        for(int i = 1; i < argc - 1; i++){
+            //open the source
+            int sourceFile;
+            if ((sourceFile = open(argv[i], O_RDONLY)) == -1){
+                puts("Error: failed to open file");
+                exit(EXIT_FAILURE);
+            }
+
+            //open the destination
+
+            //building the destination path name
+            char destPath[100];
+            destPath[0] = '\0';
+            strcat(destPath, argv[argc - 1]);
+            strcat(destPath, "/");
+            strcat(destPath, basename(argv[i]));
+            printf("destination path is: %s\n", destPath);
+
+            int destFile;
+            if ((destFile = open(destPath, O_CREAT | O_WRONLY, 0777)) == -1){
+                puts("Error: failed to open file");
+                exit(EXIT_FAILURE);
+            }
+
+            //iterate through source file
+
+            int bufferSize = 100;
+            int *buffer[bufferSize];
+            int bytesRead;
+
+            while ((bytesRead = read(sourceFile, buffer, bufferSize)) != 0){
+                write(destFile, buffer, bytesRead);
+
+            }
+
+            close(sourceFile);
+            close(destFile);
+
+        }
     }
 
     
