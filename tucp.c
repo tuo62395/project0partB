@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <libgen.h>
 
 int main(int argc, char **argv){
@@ -62,6 +60,7 @@ int main(int argc, char **argv){
         int *buffer[bufferSize];
         int bytesRead;
 
+        //note: saving num bytes read to variable so that read and write always match
         while ((bytesRead = read(sourceFile, buffer, bufferSize)) != 0){
             write(destFile, buffer, bytesRead);
 
@@ -88,11 +87,15 @@ int main(int argc, char **argv){
 
             //building the destination path name
             char destPath[100];
+            //clear the string at the start of each iteration
             destPath[0] = '\0';
+            //first, add the directory (destination)
             strcat(destPath, argv[argc - 1]);
+            //second, add a forward slash
             strcat(destPath, "/");
+            //third, add the basename of the file we're copying
             strcat(destPath, basename(argv[i]));
-            printf("destination path is: %s\n", destPath);
+            //printf("destination path is: %s\n", destPath);
 
             int destFile;
             if ((destFile = open(destPath, O_CREAT | O_WRONLY, 0777)) == -1){
