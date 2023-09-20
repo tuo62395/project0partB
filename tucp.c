@@ -1,3 +1,11 @@
+/*
+Isaac Schwartz
+CIS3207
+Project0PartB
+TUCP
+9/20/23
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
